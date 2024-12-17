@@ -3,37 +3,31 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                script {
-                    sh 'mvn clean package'
-                }
+                echo 'Building the Java application'
+                sh './mvnw clean package'
             }
         }
-
-        stage('Test') {
+        stage ('test') {
             steps {
-                script {
-                    sh 'mvn test'
-                }
+                echo 'Testing the Java application'
+                sh './mvnw test'
             }
         }
-
-        stage('Package') {
+        stage ('Docker Build and Push') {
             steps {
-                script {
-                    sh 'mvn package'
+                echo 'Building and pushing the Docker Image ot the Docker hun'
+                withCredentials([usernamePassword(credentialsId: 'my-docker-hub',
+                                                  usernameVariable: 'DOCKER_USERNAME',
+                                                  passwordVariable: 'DOCKER_PASSWORD' )]) {
+                    script {
+                        sh '''
+                            docker build -t omareldeeeb/app-test:jenkins-java .
+                            echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+                            docker push omareldeeeb/app-test:jenkins-java
+                        '''
+                    }
                 }
             }
-        }
-    }
-    post {
-        always {
-            echo 'Pipeline execution completed.'
-        }
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
