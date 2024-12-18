@@ -23,7 +23,7 @@ pipeline {
         stage('Docker Build and Push') {
             steps {
                 echo 'Building and pushing Docker image...'
-                withCredentials([usernamePassword(credentialsId: 'my-docker-hub', 
+                withCredentials([usernamePassword(credentialsId: '2', 
                                                   usernameVariable: 'DOCKER_USERNAME', 
                                                   passwordVariable: 'DOCKER_PASSWORD')]) {
                     script {
