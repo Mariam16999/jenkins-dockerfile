@@ -22,14 +22,15 @@ pipeline {
 
         stage('Docker Build and Push') {
             steps {
-                echo 'Building and pushing Docker image...'
-                withCredentials([usernamePassword(credentialsId: '2', 
-                                                  usernameVariable: 'DOCKER_USERNAME', 
-                                                  passwordVariable: 'DOCKER_PASSWORD')]) {
+               
                     script {
-                        sh "docker build -t ${DOCKER_TAG} ."
-                        sh "echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin"
-                        sh "docker push ${DOCKER_TAG}"
+                        echo 'Building and pushing to docker hub'
+                        docker.Build("docker.io/mariam16999/app-test:jenkins-test")
+
+                        docker.withRegistry('https://hub.docker.com/repository/docker/mariam16999/app-test/general','2'){
+                            docker.Image("mariam16999/app-test:jenkins-test").Push()
+                        }
+                    
                     }
                 }
             }
