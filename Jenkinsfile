@@ -7,6 +7,7 @@ pipeline {
         stage('Build') {
             steps {
                 script {
+                    echo 'Building the application...'
                     sh 'mvn clean package'
                 }
             }
@@ -15,6 +16,7 @@ pipeline {
         stage('Test') {
             steps {
                 script {
+                    echo 'Running tests...'
                     sh 'mvn test'
                 }
             }
@@ -23,9 +25,9 @@ pipeline {
         stage('Docker Build and Push') {
             steps {
                 script {
-                    echo 'Building and pushing to docker hub'
+                    echo 'Building and pushing Docker image to Docker Hub...'
                     def app = docker.build("docker.io/mariam16999/app-test:jenkins-test")
-                    docker.withRegistry('https://hub.docker.com/repository/docker/mariam16999/app-test/general', 'dockerhub-credentials') {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
                         app.push()
                         app.push('latest')
                     }
@@ -39,6 +41,7 @@ pipeline {
             script {
                 echo 'Cleaning up Docker images...'
                 sh 'docker rmi docker.io/mariam16999/app-test:jenkins-test || true'
+                sh 'docker rmi docker.io/mariam16999/app-test:latest || true'
             }
         }
     }
