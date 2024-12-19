@@ -25,7 +25,7 @@ pipeline {
                 script {
                     echo 'Building and pushing to docker hub'
                     def app = docker.build("docker.io/mariam16999/app-test:jenkins-test")
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                    docker.withRegistry('https://hub.docker.com/repository/docker/mariam16999/app-test/general', 'dockerhub-credentials') {
                         app.push()
                         app.push('latest')
                     }
