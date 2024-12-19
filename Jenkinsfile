@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_TAG = "docker.io/mariam16999/app-test:${BUILD_NUMBER ?: 'latest'}"
+        DOCKER_TAG = "docker.io/mariam16999/app-test:${env.BUILD_NUMBER ?: 'latest'}"
     }
     stages {
         stage('Build') {
@@ -22,15 +22,12 @@ pipeline {
 
         stage('Docker Build and Push') {
             steps {
-               
-                    script {
-                        echo 'Building and pushing to docker hub'
-                        docker.Build("docker.io/mariam16999/app-test:jenkins-test")
-
-                        docker.withRegistry('https://hub.docker.com/repository/docker/mariam16999/app-test/general','2'){
-                            docker.Image("mariam16999/app-test:jenkins-test").Push()
-                        }
-                    
+                script {
+                    echo 'Building and pushing to docker hub'
+                    def app = docker.build("docker.io/mariam16999/app-test:jenkins-test")
+                    docker.withRegistry('https://hub.docker.com', 'dockerhub-credentials') {
+                        app.push()
+                        app.push('latest')
                     }
                 }
             }
@@ -41,14 +38,8 @@ pipeline {
             echo 'Pipeline execution completed.'
             script {
                 echo 'Cleaning up Docker images...'
-                sh "docker rmi ${DOCKER_TAG} || echo 'Cleanup failed: Image might not exist.'"
+                sh 'docker rmi docker.io/mariam16999/app-test:jenkins-test || true'
             }
-        }
-        success {
-            echo 'Pipeline succeeded!'
-        }
-        failure {
-            echo 'Pipeline failed.'
         }
     }
 }
