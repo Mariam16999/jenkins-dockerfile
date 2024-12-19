@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_TAG = "docker.io/Mariam16999/app-test:${BUILD_NUMBER ?: 'latest'}"
+        DOCKER_TAG = "docker.io/mariam16999/app-test:${BUILD_NUMBER ?: 'latest'}"
     }
     stages {
         stage('Build') {
