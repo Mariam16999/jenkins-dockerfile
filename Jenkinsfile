@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_TAG = "Mariam16999/app-test:${env.BUILD_NUMBER ?: 'latest'}"
+        DOCKER_TAG = "Mariam16999/app-test:${BUILD_NUMBER ?: 'latest'}"
     }
     stages {
         stage('Build') {
@@ -38,18 +38,16 @@ pipeline {
     post {
         always {
             echo 'Pipeline execution completed.'
+            script {
+                echo 'Cleaning up Docker images...'
+                sh "docker rmi ${DOCKER_TAG} || echo 'Cleanup failed: Image might not exist.'"
+            }
         }
         success {
             echo 'Pipeline succeeded!'
         }
         failure {
             echo 'Pipeline failed.'
-        }
-        cleanup {
-            script {
-                echo 'Cleaning up Docker images...'
-                sh "docker rmi ${DOCKER_TAG} || true"
-            }
         }
     }
 }
